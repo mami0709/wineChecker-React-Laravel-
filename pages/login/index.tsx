@@ -33,10 +33,10 @@ const LoginForm = () => {
         password,
       });
 
-      // ここでresponseからtokenを取得し、localStorageなどに保存します。
+      // レスポンスからトークンを取得し、localStorageに保存
       localStorage.setItem("token", response.data.token);
 
-      // ログインに成功したら、ユーザーをホームページなどにリダイレクト
+      // ログイン成功後、ユーザーをホームページにリダイレクト
       window.location.replace("/");
     } catch (error) {
       console.log(error.response.data);

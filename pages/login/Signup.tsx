@@ -32,20 +32,24 @@ const Signup = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/userInfo/userRegistration.php",
+        "http://localhost:18888/api/register",
         {
-          email,
-          password,
+          mail_address: email,
+          user_password: password,
         }
       );
       setSuccess(response.data.message);
     } catch (error) {
       if (error.response) {
-        // サーバーが200レンジ以外のステータスで応答した場合
+        // リクエストは行われましたが、サーバが2xxの範囲外のステータスコードで応答しました
+        console.log(error.response.data);
+        console.log(error.response.status);
         setError(error.response.data.message);
       } else if (error.request) {
+        // リクエストは行われましたが、応答は受け取られませんでした
         setError("サーバが応答しなかったので、後でもう一度試してください。");
       } else {
+        // リクエストの設定中にエラーが発生した何かが起きました
         setError(
           "リクエストの設定中にエラーが発生しました。再試行してください。"
         );
