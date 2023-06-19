@@ -28,16 +28,19 @@ const LoginForm = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:8080/login/login.php", {
+      const response = await axios.post("http://localhost:18888/api/login", {
         email,
         password,
       });
-      const token = response.data.token;
-      // token を保存
-      localStorage.setItem("token", token);
+
+      // ここでresponseからtokenを取得し、localStorageなどに保存します。
+      localStorage.setItem("token", response.data.token);
+
       // ログインに成功したら、ユーザーをホームページなどにリダイレクト
       window.location.replace("/");
     } catch (error) {
+      console.log(error.response.data);
+      console.log(error.response.status);
       setError("メールアドレスまたはパスワードが正しくありません。");
     }
   };

@@ -78,15 +78,12 @@ const Recommend: NextPage = () => {
   // マウント時にワインリストを取得する
   React.useEffect(() => {
     setLoading(true);
-    axios
-      .get("http://localhost:8080/recommend/recommend.php", {})
-      .then((res) => {
-        const { result, data } = res.data;
-        if (result === "SUCCESS") {
-          setWineList(data);
-        }
-        setLoading(false);
-      });
+    axios.get("http://localhost:18888/api/recommend", {}).then((res) => {
+      if (res.data) {
+        setWineList(res.data);
+      }
+      setLoading(false);
+    });
   }, []);
 
   const gridContainerStyle = {

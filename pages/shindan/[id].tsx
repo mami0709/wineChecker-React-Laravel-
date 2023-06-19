@@ -11,7 +11,7 @@ import { OutlineButton } from "../components/Button/outlineButton";
 const WineDetail: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const backendBaseUrl = "http://localhost:8080/recommend/recommend[id].php";
+  const backendBaseUrl = "http://localhost:18888/api/recommend";
   //レスポンシブ設定を定義
   const matches = useMediaQuery("(min-width:767px)");
 
@@ -22,10 +22,9 @@ const WineDetail: NextPage = () => {
   React.useEffect(() => {
     if (id) {
       setLoading(true);
-      axios.get(`${backendBaseUrl}?id=${id}`).then((res) => {
-        const { result, data } = res.data;
-        if (result === "SUCCESS") {
-          setWineData(data[0]); // ここで data の最初の要素を取得します。
+      axios.get(`${backendBaseUrl}/${id}`).then((res) => {
+        if (res.data) {
+          setWineData(res.data);
         }
         setLoading(false);
       });

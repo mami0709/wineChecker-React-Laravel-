@@ -5,6 +5,7 @@ import "../../styles/Home.module.css";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import AppTab from "../../pages/components/AppTab";
 import ActionTab from "../../pages/components/ActionTab";
+import axios from "axios";
 
 export const DefaultLayout: React.FC<{
   children: React.ReactNode;
@@ -18,16 +19,37 @@ export const DefaultLayout: React.FC<{
 
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
+  // ログイン状態かを確認
   React.useEffect(() => {
     const token = localStorage.getItem("token");
     setIsAuthenticated(!!token);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token");
+
+    // バックエンドにログアウト要求を送信する
+    try {
+      const response = await axios.post(
+        "http://localhost:18888/api/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+
+    // トークンを削除し、認証状態を更新する
     localStorage.removeItem("token");
+    setIsAuthenticated(false);
+
     alert("ログアウトしました。");
     window.location.replace("/");
-    setIsAuthenticated(false);
   };
 
   return (

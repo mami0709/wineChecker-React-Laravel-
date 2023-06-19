@@ -19,15 +19,18 @@ export const ResultShiro: NextPage = () => {
 
   React.useEffect(() => {
     axios
-      .get("http://localhost:8080/shindan/resultShiro.php", {})
+      .get("http://localhost:18888/api/resultShiroWine", {})
       .then((res) => {
-        const { result, data } = res.data;
-        if (result === "SUCCESS") {
-          setWineList(data);
+        if (res.data) {
+          setWineList(res.data);
+        } else {
+          // サーバーからエラーレスポンスが返されたときの処理
+          console.error("Server returned an error response:", res);
         }
       })
       .catch((err) => {
-        console.error(err);
+        // ネットワークエラーやリクエストが中断されたときの処理
+        console.error("An error occurred while fetching data:", err);
       })
       .finally(() => {
         setLoading(false);

@@ -19,11 +19,10 @@ export const ResultAka: NextPage = () => {
 
   React.useEffect(() => {
     axios
-      .get("http://localhost:8080/shindan/resultAka.php", {})
+      .get("http://localhost:18888/api/resultAkaWine", {})
       .then((res) => {
-        const { result, data } = res.data;
-        if (result === "SUCCESS") {
-          setWineList(data);
+        if (res.data) {
+          setWineList(res.data);
         } else {
           // サーバーからエラーレスポンスが返されたときの処理
           console.error("Server returned an error response:", res);
