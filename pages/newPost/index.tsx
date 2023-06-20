@@ -25,7 +25,7 @@ const customLabels = {
   comment: "詳細コメント",
   wine_name: "ワイン名*",
   winery: "ワイナリー*",
-  wine_type: "ワインの種類(赤ワイン、白ワインetc)*",
+  wine_type: "ワインの種類*(赤ワイン、白ワインetc)",
   wine_image: "ワイン画像のURL*",
   wine_country: "産地*",
   wine_url: "ワインのURL*",
@@ -37,23 +37,12 @@ const customLabels = {
   capacity: "容量",
 };
 
-// 必須入力フィールドの名前を配列で定義
-const notNullFields = [
-  "wine_name",
-  "winery",
-  "wine_type",
-  "wine_image",
-  "wine_country",
-  "wine_url",
-  "breed",
-];
-
 const WineRegistration = () => {
   const [wineInfo, setWineInfo] = useState(initialWineInfo);
   const [errors, setErrors] = useState({});
   const router = useRouter();
 
-	// 入力フィールドの状態を見る。変更されると`setWineInfo`が書き変わる。
+  // 入力フィールドの状態を見る。変更されると`setWineInfo`が書き変わる。
   const handleChange = useCallback((name, value) => {
     setWineInfo((prevState) => ({
       ...prevState,
@@ -61,57 +50,32 @@ const WineRegistration = () => {
     }));
   }, []);
 
-	// バリデーションチェック
-  const validate = useCallback(() => {
-    let tempErrors = {};
-    let formIsValid = true;
-
-    notNullFields.forEach((field) => {
-      if (!wineInfo[field]) {
-        formIsValid = false;
-        tempErrors[field] = "入力必須項目が未入力です。入力してください";
-      }
-    });
-
-    if (wineInfo.capacity && !Number.isInteger(Number(wineInfo.capacity))) {
-      formIsValid = false;
-      tempErrors["capacity"] = "半角数字で入力して下さい";
-    }
-
-    setErrors(tempErrors);
-    return formIsValid;
-  }, [wineInfo]);
-
   const handleSubmit = useCallback(
     (e) => {
-      e.preventDefault();// フォームのデフォルトの送信動作を防ぐ
+      e.preventDefault(); // フォームのデフォルトの送信動作を防ぐ
 
-      if (validate()) {
-        console.log(wineInfo);
-				// バリデーションが成功した場合、非同期でサーバーにデータを送信
-        axios
-          .post("http://localhost:8080/recommend/newPost.php", wineInfo, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-          .then((response) => {
-						// サーバーからの応答にエラーが含まれていれば、そのエラーメッセージをアラートとして表示
-            console.log(response.data);
-            if (response.data.error) {
-              alert(response.data.error);
-            } else {
-							// エラーがなければ成功メッセージをアラートとして表示し、ユーザーを「/newPost/PostComplete」ページにリダイレクト
-              alert(response.data.message);
-              router.push("/newPost/PostComplete");
-            }
-          })
-          .catch((error) => {
-            console.error(`Error: ${error}`);
-          });
-      }
+      axios
+        .post("http://localhost:18888/api/newPost", wineInfo, {
+          validateStatus: function (status) {
+            return status < 500; // Reject only if the status code is greater than or equal to 500
+          },
+        })
+        .then((response) => {
+          console.log(response.data);
+          if (response.data.errors) {
+            // サーバーからの応答にエラーが含まれていれば、そのエラーメッセージをstateとして設定
+            setErrors(response.data.errors);
+          } else {
+            // エラーがなければ成功メッセージをアラートとして表示し、ユーザーを「/newPost/PostComplete」ページにリダイレクト
+            alert(response.data.message);
+            router.push("/newPost/PostComplete");
+          }
+        })
+        .catch((error) => {
+          console.error(`Error: ${error}`);
+        });
     },
-    [validate, wineInfo, router]
+    [wineInfo, router]
   );
 
   return (
@@ -137,8 +101,8 @@ const WineRegistration = () => {
                   label={customLabels[key]}
                   value={wineInfo[key]}
                   handleChange={handleChange}
-                  error={!!errors[key]} // このキーにエラーがある場合、trueになる
-                  helperText={errors[key]} // 画面にエラーメッセージの表示
+                  error={!!errors[key]} // エラーがある場合はtrueになる
+                  helperText={errors[key]} // エラーメッセージの表示
                 />
               </Grid>
             ))}
