@@ -10,7 +10,6 @@ import {
   Button,
 } from "@mui/material";
 
-
 const UserInfo = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [error, setError] = useState(null);
@@ -31,12 +30,12 @@ const UserInfo = () => {
       return;
     }
 
-		// ログイン済みのユーザーの情報をサーバーから取得する
+    // ログイン済みのユーザーの情報をサーバーから取得する
     const fetchUserInfo = async () => {
       try {
-				// 正当なトークンであれば対応するユーザーの情報を`set〇〇`に格納
+        // 正当なトークンであれば対応するユーザーの情報を`set〇〇`に格納
         const response = await axios.get(
-          `http://localhost:8080/userInfo/getUser.php?token=${token}`
+          `http://localhost:18888/api/userInfo/getUser?token=${token}`
         );
         setUserInfo(response.data);
         setUserName(response.data.user_name);
@@ -53,23 +52,25 @@ const UserInfo = () => {
     fetchUserInfo();
   }, []);
 
-	// 「更新する」ボタンを押したときの処理
+  // 「更新する」ボタンを押したときの処理
   const handleEdit = async () => {
-    const params = new URLSearchParams();
-    params.append("id", userInfo.id);
-    params.append("user_name", userName);
-    params.append("user_name_hiragana", userNameHiragana);
-    params.append("nickname", nickname);
-    params.append("mail_address", email);
-    params.append("telephone_number", telephoneNumber);
-    params.append("user_password", password);
-
+    const params = {
+      id: userInfo.id,
+      user_name: userName,
+      user_name_hiragana: userNameHiragana,
+      nickname: nickname,
+      mail_address: email,
+      telephone_number: telephoneNumber,
+      user_password: password,
+    };
     console.log(params);
 
     try {
-			// 更新したいユーザー情報を含むPOSTリクエストをサーバーに送信
+      const token = localStorage.getItem("token");
+
+      // 更新したいユーザー情報を含むPOSTリクエストをサーバーに送信
       await axios.post(
-        `http://localhost:8080/userInfo/updateUser.php`,
+        `http://localhost:18888/api/userInfo/updateUser?token=${token}`,
         JSON.stringify({
           id: userInfo.id,
           user_name: userName,
@@ -78,12 +79,7 @@ const UserInfo = () => {
           mail_address: email,
           telephone_number: telephoneNumber,
           user_password: password,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        })
       );
       alert("ユーザー情報が更新されました！");
     } catch (error) {
